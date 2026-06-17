@@ -8,6 +8,16 @@ export default async function Nav() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  let isAdmin = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_admin")
+      .eq("id", user.id)
+      .single();
+    isAdmin = profile?.is_admin ?? false;
+  }
+
   return (
     <header className="border-b border-black/10 dark:border-white/10">
       <div className="mx-auto flex w-full max-w-4xl flex-wrap items-center justify-between gap-2 px-4 py-4">
@@ -20,6 +30,7 @@ export default async function Nav() {
               <Link href="/posts/new">글쓰기</Link>
               <Link href="/my-posts">내 글</Link>
               <Link href="/account">계정</Link>
+              {isAdmin && <Link href="/admin/approvals">관리자 승인</Link>}
               <span className="text-black/50 dark:text-white/50">
                 {user.email}
               </span>
