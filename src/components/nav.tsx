@@ -12,7 +12,7 @@ export default async function Nav() {
     <header className="border-b border-black/10 dark:border-white/10">
       <div className="mx-auto flex w-full max-w-4xl flex-wrap items-center justify-between gap-2 px-4 py-4">
         <Link href="/" className="text-base font-bold sm:text-lg">
-          26년 7월 SK그룹 신입구성원과정 Q&A 게시판
+          2026년 7월 SK그룹 신입구성원과정 (7/1 ~ 7/15)
         </Link>
         <nav className="flex items-center gap-4 text-sm">
           {user ? (
