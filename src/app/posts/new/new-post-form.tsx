@@ -162,7 +162,7 @@ export default function NewPostForm({ isAdmin }: { isAdmin: boolean }) {
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value as PostCategory)}
-          className="rounded border border-black/20 px-3 py-2 dark:border-white/20 dark:bg-transparent"
+          className="rounded border border-black/20 bg-white px-3 py-2 text-black dark:border-white/20 dark:bg-zinc-900 dark:text-white [color-scheme:dark]"
         >
           {POST_CATEGORIES.map((c) => (
             <option key={c} value={c}>
