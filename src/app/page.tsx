@@ -16,7 +16,7 @@ export default async function Home({
 
   let query = supabase
     .from("posts")
-    .select("id, title, author, created_at, is_notice")
+    .select("id, title, author, created_at, is_notice, user_id")
     .order("is_notice", { ascending: false })
     .order("created_at", { ascending: false });
 
@@ -26,6 +26,40 @@ export default async function Home({
   }
 
   const { data: posts, error } = await query;
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let isAdmin = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_admin")
+      .eq("id", user.id)
+      .single();
+    isAdmin = profile?.is_admin ?? false;
+  }
+
+  const authorInfo = new Map<
+    string,
+    { name: string | null; company: string | null }
+  >();
+
+  if (isAdmin && posts && posts.length > 0) {
+    const userIds = Array.from(
+      new Set(posts.map((p) => p.user_id).filter((id): id is string => !!id))
+    );
+    if (userIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, name, company")
+        .in("id", userIds);
+      profiles?.forEach((p) =>
+        authorInfo.set(p.id, { name: p.name, company: p.company })
+      );
+    }
+  }
 
   return (
     <div>
@@ -65,25 +99,34 @@ export default async function Home({
         </p>
       ) : (
         <ul className="divide-y divide-black/10 dark:divide-white/10">
-          {posts.map((post) => (
-            <li key={post.id} className="py-4">
-              <Link
-                href={`/posts/${post.id}`}
-                className="text-lg font-medium hover:underline"
-              >
-                {post.is_notice && (
-                  <span className="mr-2 rounded bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
-                    공지
-                  </span>
-                )}
-                {post.title}
-              </Link>
-              <p className="mt-1 text-sm text-black/50 dark:text-white/50">
-                {maskEmail(post.author)} ·{" "}
-                {new Date(post.created_at).toLocaleString("ko-KR")}
-              </p>
-            </li>
-          ))}
+          {posts.map((post) => {
+            const info = isAdmin ? authorInfo.get(post.user_id) : undefined;
+            return (
+              <li key={post.id} className="py-4">
+                <Link
+                  href={`/posts/${post.id}`}
+                  className="text-lg font-medium hover:underline"
+                >
+                  {post.is_notice && (
+                    <span className="mr-2 rounded bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
+                      공지
+                    </span>
+                  )}
+                  {post.title}
+                </Link>
+                <p className="mt-1 text-sm text-black/50 dark:text-white/50">
+                  {info && (
+                    <span className="font-medium text-black dark:text-white">
+                      {info.name ?? "이름없음"} ({info.company ?? "회사없음"})
+                      {" · "}
+                    </span>
+                  )}
+                  {maskEmail(post.author)} ·{" "}
+                  {new Date(post.created_at).toLocaleString("ko-KR")}
+                </p>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

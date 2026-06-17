@@ -13,7 +13,7 @@ export default async function PostPage({
 
   const { data: post } = await supabase
     .from("posts")
-    .select("id, title, content, author, created_at, is_notice")
+    .select("id, title, content, author, created_at, is_notice, user_id")
     .eq("id", id)
     .single();
 
@@ -47,6 +47,17 @@ export default async function PostPage({
     isAdmin = profile?.is_admin ?? false;
   }
 
+  let authorInfo: { name: string | null; company: string | null } | null =
+    null;
+  if (isAdmin) {
+    const { data: authorProfile } = await supabase
+      .from("profiles")
+      .select("name, company")
+      .eq("id", post.user_id)
+      .single();
+    authorInfo = authorProfile ?? null;
+  }
+
   return (
     <article>
       <h1 className="text-2xl font-bold">
@@ -58,6 +69,12 @@ export default async function PostPage({
         {post.title}
       </h1>
       <p className="mt-2 text-sm text-black/50 dark:text-white/50">
+        {authorInfo && (
+          <span className="font-medium text-black dark:text-white">
+            {authorInfo.name ?? "이름없음"} ({authorInfo.company ?? "회사없음"})
+            {" · "}
+          </span>
+        )}
         {maskEmail(post.author)} · {new Date(post.created_at).toLocaleString("ko-KR")}
       </p>
       <p className="mt-6 whitespace-pre-wrap leading-relaxed">
