@@ -6,6 +6,11 @@ function escapeForFilter(value: string) {
   return value.replace(/[,().:]/g, "\\$&");
 }
 
+function getSnippet(content: string, maxLength = 80) {
+  const flat = content.replace(/\s+/g, " ").trim();
+  return flat.length > maxLength ? `${flat.slice(0, maxLength)}...` : flat;
+}
+
 export default async function Home({
   searchParams,
 }: {
@@ -16,7 +21,7 @@ export default async function Home({
 
   let query = supabase
     .from("posts")
-    .select("id, title, author, created_at, is_notice, user_id")
+    .select("id, title, content, author, created_at, is_notice, user_id")
     .order("is_notice", { ascending: false })
     .order("created_at", { ascending: false });
 
@@ -118,7 +123,7 @@ export default async function Home({
               <li key={post.id} className="py-4">
                 <Link
                   href={`/posts/${post.id}`}
-                  className="text-lg font-medium hover:underline"
+                  className="text-lg font-bold hover:underline"
                 >
                   {post.is_notice && (
                     <span className="mr-2 rounded bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
@@ -127,7 +132,10 @@ export default async function Home({
                   )}
                   {post.title}
                 </Link>
-                <p className="mt-1 text-sm text-black/50 dark:text-white/50">
+                <p className="mt-1 line-clamp-1 text-sm text-black/60 dark:text-white/60">
+                  {getSnippet(post.content)}
+                </p>
+                <p className="mt-1 text-xs text-black/50 dark:text-white/50">
                   {info && (
                     <span className="font-medium text-black dark:text-white">
                       {info.name ?? "이름없음"} ({info.company ?? "회사없음"})
