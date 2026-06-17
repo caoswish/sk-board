@@ -44,7 +44,7 @@ export default async function Home({
   }
 
   const answeredPostIds = new Set<number>();
-  if (posts && posts.length > 0) {
+  if (user && posts && posts.length > 0) {
     const { data: answeredRows } = await supabase
       .from("replies")
       .select("post_id")
@@ -78,8 +78,8 @@ export default async function Home({
   return (
     <div>
       {!user && (
-        <p className="mb-6 rounded border border-black/10 bg-black/5 px-4 py-3 text-sm dark:border-white/10 dark:bg-white/5">
-          글을 쓰려면 로그인 또는 회원가입이 필요해요.{" "}
+        <p className="mb-6 rounded-lg border-2 border-amber-400 bg-amber-50 px-4 py-4 text-base font-bold text-amber-900 dark:border-amber-500 dark:bg-amber-950 dark:text-amber-200">
+          글을 쓰거나 답변을 확인하려면 로그인이 필요해요.{" "}
           <Link href="/login" className="underline">
             로그인
           </Link>
@@ -137,7 +137,7 @@ export default async function Home({
                     ? `${info.name ?? "이름없음"} (${info.company ?? "회사없음"})`
                     : undefined
                 }
-                isAnswered={answeredPostIds.has(post.id)}
+                isAnswered={user ? answeredPostIds.has(post.id) : undefined}
               />
             );
           })}

@@ -41,7 +41,11 @@ export default function PostListItem({
           </span>
         )}
         {!post.is_notice &&
-          (isAnswered ? (
+          (isAnswered === undefined ? (
+            <span className="mr-2 rounded bg-blue-600 px-2 py-0.5 text-xs font-bold text-white">
+              로그인 후 확인
+            </span>
+          ) : isAnswered ? (
             <span className="mr-2 rounded bg-green-600 px-2 py-0.5 text-xs font-bold text-white">
               답변완료
             </span>

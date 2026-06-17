@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ReplyForm from "./reply-form";
 import PrivacyToggle from "./privacy-toggle";
+import DeletePostButton from "./delete-post-button";
 
 export default async function PostPage({
   params,
@@ -49,6 +51,8 @@ export default async function PostPage({
     isAdmin = profile?.is_admin ?? false;
   }
 
+  const isOwner = user?.id === post.user_id;
+
   let authorInfo: { name: string | null; company: string | null } | null =
     null;
   if (isAdmin) {
@@ -75,9 +79,12 @@ export default async function PostPage({
         )}
         {post.title}
       </h1>
-      {isAdmin && (
-        <div className="mt-2">
-          <PrivacyToggle postId={post.id} isPrivate={post.is_private} />
+      {(isAdmin || isOwner) && (
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          {isAdmin && (
+            <PrivacyToggle postId={post.id} isPrivate={post.is_private} />
+          )}
+          <DeletePostButton postId={post.id} />
         </div>
       )}
       <p className="mt-2 text-sm text-black/50 dark:text-white/50">
@@ -122,7 +129,18 @@ export default async function PostPage({
       <section className="mt-10 border-t border-black/10 pt-6 dark:border-white/10">
         <h2 className="text-lg font-semibold">답글</h2>
 
-        {replies && replies.length > 0 ? (
+        {!user ? (
+          <p className="mt-4 rounded-lg border-2 border-amber-400 bg-amber-50 px-4 py-4 text-base font-bold text-amber-900 dark:border-amber-500 dark:bg-amber-950 dark:text-amber-200">
+            답변을 확인하려면 로그인이 필요해요.{" "}
+            <Link href="/login" className="underline">
+              로그인
+            </Link>
+            {" · "}
+            <Link href="/signup" className="underline">
+              회원가입
+            </Link>
+          </p>
+        ) : replies && replies.length > 0 ? (
           <ul className="mt-4 flex flex-col gap-4">
             {replies.map((reply) => (
               <li
