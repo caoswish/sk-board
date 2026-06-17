@@ -87,7 +87,7 @@ export default async function NoticesPage() {
           href="/"
           className="flex-1 rounded bg-black px-4 py-3 text-center font-medium text-white dark:bg-white dark:text-black"
         >
-          문의 게시판 바로가기
+          과정 문의 바로가기
         </Link>
         <Link
           href="/faq"

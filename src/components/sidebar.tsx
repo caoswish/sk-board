@@ -4,8 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const TABS = [
-  { href: "/", label: "문의게시판" },
   { href: "/notices", label: "공지사항" },
+  { href: "/", label: "과정 문의" },
   { href: "/faq", label: "FAQ" },
 ];
 
