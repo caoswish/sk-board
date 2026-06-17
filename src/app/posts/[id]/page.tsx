@@ -4,6 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import ReplyForm from "./reply-form";
 import PrivacyToggle from "./privacy-toggle";
 import DeletePostButton from "./delete-post-button";
+import LikeButton from "./like-button";
+
+const FAQ_RECOMMEND_THRESHOLD = 10;
 
 export default async function PostPage({
   params,
@@ -53,6 +56,22 @@ export default async function PostPage({
 
   const isOwner = user?.id === post.user_id;
 
+  const { count: likeCount } = await supabase
+    .from("post_likes")
+    .select("*", { count: "exact", head: true })
+    .eq("post_id", id);
+
+  let likedByMe = false;
+  if (user) {
+    const { data: myLike } = await supabase
+      .from("post_likes")
+      .select("post_id")
+      .eq("post_id", id)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    likedByMe = !!myLike;
+  }
+
   let authorInfo: { name: string | null; company: string | null } | null =
     null;
   if (isAdmin) {
@@ -99,6 +118,23 @@ export default async function PostPage({
       <p className="mt-6 whitespace-pre-wrap leading-relaxed">
         {post.content}
       </p>
+
+      {!post.is_notice && (
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          {user && (
+            <LikeButton
+              postId={post.id}
+              initialLiked={likedByMe}
+              initialCount={likeCount ?? 0}
+            />
+          )}
+          {isAdmin && (likeCount ?? 0) >= FAQ_RECOMMEND_THRESHOLD && (
+            <span className="rounded bg-yellow-500 px-2 py-1 text-xs font-bold text-white">
+              ⭐ FAQ 등록 추천 (추천 {likeCount}개)
+            </span>
+          )}
+        </div>
+      )}
 
       {attachments && attachments.length > 0 && (
         <div className="mt-6 flex flex-col gap-3">
