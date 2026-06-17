@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ReplyForm from "./reply-form";
+import ReplyItem from "./reply-item";
 import PrivacyToggle from "./privacy-toggle";
 import DeletePostButton from "./delete-post-button";
 import LikeButton from "./like-button";
@@ -188,15 +189,7 @@ export default async function PostPage({
         ) : replies && replies.length > 0 ? (
           <ul className="mt-4 flex flex-col gap-4">
             {replies.map((reply) => (
-              <li
-                key={reply.id}
-                className="rounded bg-black/5 p-4 dark:bg-white/5"
-              >
-                <p className="whitespace-pre-wrap">{reply.content}</p>
-                <p className="mt-2 text-xs text-black/50 dark:text-white/50">
-                  관리자 · {new Date(reply.created_at).toLocaleString("ko-KR")}
-                </p>
-              </li>
+              <ReplyItem key={reply.id} reply={reply} isAdmin={isAdmin} />
             ))}
           </ul>
         ) : (

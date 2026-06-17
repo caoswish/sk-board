@@ -39,3 +39,23 @@ export async function createReply(
   revalidatePath(`/posts/${postId}`);
   return undefined;
 }
+
+export async function updateReply(replyId: number, content: string) {
+  const trimmed = content.trim();
+
+  if (!trimmed) {
+    return { error: "답글 내용을 입력해주세요." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("replies")
+    .update({ content: trimmed })
+    .eq("id", replyId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return {};
+}
