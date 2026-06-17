@@ -1,7 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { updateReply } from "@/app/actions/replies";
+import { updateReply, deleteReply } from "@/app/actions/replies";
 
 type Reply = {
   id: number;
@@ -16,6 +17,7 @@ export default function ReplyItem({
   reply: Reply;
   isAdmin: boolean;
 }) {
+  const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [savedContent, setSavedContent] = useState(reply.content);
   const [content, setContent] = useState(reply.content);
@@ -32,6 +34,19 @@ export default function ReplyItem({
       }
       setSavedContent(content);
       setEditing(false);
+    });
+  }
+
+  function handleDelete() {
+    if (!window.confirm("정말 이 답글을 삭제하시겠어요?")) return;
+    setError("");
+    startTransition(async () => {
+      const result = await deleteReply(reply.id);
+      if (result?.error) {
+        setError(result.error);
+        return;
+      }
+      router.refresh();
     });
   }
 
@@ -71,19 +86,30 @@ export default function ReplyItem({
 
   return (
     <li className="rounded bg-black/5 p-4 dark:bg-white/5">
+      {error && <p className="mb-2 text-xs text-red-600">{error}</p>}
       <p className="whitespace-pre-wrap">{savedContent}</p>
       <div className="mt-2 flex items-center justify-between">
         <p className="text-xs text-black/50 dark:text-white/50">
           관리자 · {new Date(reply.created_at).toLocaleString("ko-KR")}
         </p>
         {isAdmin && (
-          <button
-            type="button"
-            onClick={() => setEditing(true)}
-            className="text-xs underline"
-          >
-            수정
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="text-xs underline"
+            >
+              수정
+            </button>
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={isPending}
+              className="text-xs text-red-600 underline disabled:opacity-50"
+            >
+              {isPending ? "삭제 중..." : "삭제"}
+            </button>
+          </div>
         )}
       </div>
     </li>

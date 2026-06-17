@@ -59,3 +59,14 @@ export async function updateReply(replyId: number, content: string) {
 
   return {};
 }
+
+export async function deleteReply(replyId: number) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("replies").delete().eq("id", replyId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return {};
+}
