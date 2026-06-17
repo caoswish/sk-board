@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { maskEmail } from "@/lib/mask-email";
 import ReplyForm from "./reply-form";
 
 export default async function PostPage({
@@ -57,7 +58,7 @@ export default async function PostPage({
         {post.title}
       </h1>
       <p className="mt-2 text-sm text-black/50 dark:text-white/50">
-        {post.author} · {new Date(post.created_at).toLocaleString("ko-KR")}
+        {maskEmail(post.author)} · {new Date(post.created_at).toLocaleString("ko-KR")}
       </p>
       <p className="mt-6 whitespace-pre-wrap leading-relaxed">
         {post.content}

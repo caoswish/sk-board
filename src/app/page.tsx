@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { maskEmail } from "@/lib/mask-email";
 
 function escapeForFilter(value: string) {
   return value.replace(/[,().:]/g, "\\$&");
@@ -78,7 +79,7 @@ export default async function Home({
                 {post.title}
               </Link>
               <p className="mt-1 text-sm text-black/50 dark:text-white/50">
-                {post.author} ·{" "}
+                {maskEmail(post.author)} ·{" "}
                 {new Date(post.created_at).toLocaleString("ko-KR")}
               </p>
             </li>
