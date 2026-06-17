@@ -63,6 +63,19 @@ export default async function Home({
 
   return (
     <div>
+      {!user && (
+        <p className="mb-6 rounded border border-black/10 bg-black/5 px-4 py-3 text-sm dark:border-white/10 dark:bg-white/5">
+          글을 쓰려면 로그인 또는 회원가입이 필요해요.{" "}
+          <Link href="/login" className="underline">
+            로그인
+          </Link>
+          {" · "}
+          <Link href="/signup" className="underline">
+            회원가입
+          </Link>
+        </p>
+      )}
+
       <form action="/" className="mb-6 flex gap-2">
         <input
           type="text"
