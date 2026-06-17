@@ -20,6 +20,18 @@ export default async function MyPostsPage() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
+  const answeredPostIds = new Set<number>();
+  if (posts && posts.length > 0) {
+    const { data: answeredRows } = await supabase
+      .from("replies")
+      .select("post_id")
+      .in(
+        "post_id",
+        posts.map((p) => p.id)
+      );
+    answeredRows?.forEach((row) => answeredPostIds.add(row.post_id));
+  }
+
   return (
     <div>
       <h1 className="mb-6 text-xl font-bold">내 글</h1>
@@ -35,7 +47,11 @@ export default async function MyPostsPage() {
       ) : (
         <ul className="divide-y divide-black/10 dark:divide-white/10">
           {posts.map((post) => (
-            <PostListItem key={post.id} post={post} />
+            <PostListItem
+              key={post.id}
+              post={post}
+              isAnswered={answeredPostIds.has(post.id)}
+            />
           ))}
         </ul>
       )}

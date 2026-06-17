@@ -43,6 +43,18 @@ export default async function Home({
     isAdmin = profile?.is_admin ?? false;
   }
 
+  const answeredPostIds = new Set<number>();
+  if (posts && posts.length > 0) {
+    const { data: answeredRows } = await supabase
+      .from("replies")
+      .select("post_id")
+      .in(
+        "post_id",
+        posts.map((p) => p.id)
+      );
+    answeredRows?.forEach((row) => answeredPostIds.add(row.post_id));
+  }
+
   const authorInfo = new Map<
     string,
     { name: string | null; company: string | null }
@@ -125,6 +137,7 @@ export default async function Home({
                     ? `${info.name ?? "이름없음"} (${info.company ?? "회사없음"})`
                     : undefined
                 }
+                isAnswered={answeredPostIds.has(post.id)}
               />
             );
           })}

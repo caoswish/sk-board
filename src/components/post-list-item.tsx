@@ -18,9 +18,11 @@ function getSnippet(content: string, maxLength = 80) {
 export default function PostListItem({
   post,
   authorLabel,
+  isAnswered,
 }: {
   post: Post;
   authorLabel?: string;
+  isAnswered?: boolean;
 }) {
   return (
     <li className="py-4">
@@ -38,6 +40,16 @@ export default function PostListItem({
             🔒비공개
           </span>
         )}
+        {!post.is_notice &&
+          (isAnswered ? (
+            <span className="mr-2 rounded bg-green-600 px-2 py-0.5 text-xs font-bold text-white">
+              답변완료
+            </span>
+          ) : (
+            <span className="mr-2 rounded bg-black/30 px-2 py-0.5 text-xs font-bold text-white dark:bg-white/30">
+              답변대기
+            </span>
+          ))}
         {post.title}
       </Link>
       <p className="mt-1 line-clamp-1 text-sm text-black/60 dark:text-white/60">

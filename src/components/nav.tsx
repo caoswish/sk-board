@@ -15,6 +15,8 @@ export default async function Nav() {
           26년 7월 SK그룹 신입구성원과정 Q&A 게시판
         </Link>
         <nav className="flex items-center gap-4 text-sm">
+          <Link href="/notices">공지사항</Link>
+          <Link href="/faq">FAQ</Link>
           {user ? (
             <>
               <Link href="/posts/new">글쓰기</Link>
