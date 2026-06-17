@@ -100,6 +100,12 @@ export default async function PostPage({
       </h1>
       {(isAdmin || isOwner) && (
         <div className="mt-2 flex flex-wrap items-center gap-2">
+          <Link
+            href={`/posts/${post.id}/edit`}
+            className="rounded border border-black/20 px-3 py-1 text-xs dark:border-white/20"
+          >
+            수정
+          </Link>
           {isAdmin && (
             <PrivacyToggle postId={post.id} isPrivate={post.is_private} />
           )}

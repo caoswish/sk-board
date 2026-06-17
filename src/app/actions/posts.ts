@@ -20,6 +20,43 @@ export async function togglePrivacy(postId: number, nextValue: boolean) {
   return {};
 }
 
+export type UpdatePostState = { error?: string } | undefined;
+
+export async function updatePost(
+  postId: number,
+  isAdmin: boolean,
+  _prevState: UpdatePostState,
+  formData: FormData
+): Promise<UpdatePostState> {
+  const title = (formData.get("title") as string)?.trim();
+  const content = (formData.get("content") as string)?.trim();
+  const isPrivate = formData.get("isPrivate") === "on";
+  const isNotice = isAdmin && formData.get("isNotice") === "on";
+
+  if (!title || !content) {
+    return { error: "제목과 내용을 모두 입력해주세요." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("posts")
+    .update({
+      title,
+      content,
+      is_private: isPrivate,
+      is_notice: isNotice,
+    })
+    .eq("id", postId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath(`/posts/${postId}`);
+  revalidatePath("/");
+  redirect(`/posts/${postId}`);
+}
+
 export async function deletePost(postId: number) {
   const supabase = await createClient();
   const { error } = await supabase.from("posts").delete().eq("id", postId);
