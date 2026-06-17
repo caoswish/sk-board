@@ -17,24 +17,43 @@ export default function NewPostForm({ isAdmin }: { isAdmin: boolean }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isNotice, setIsNotice] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(false);
   const [files, setFiles] = useState<PendingFile[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   function addFiles(newFiles: FileList | File[]) {
     const incoming = Array.from(newFiles);
-    const tooLarge = incoming.filter((file) => file.size > MAX_FILE_SIZE);
-    const valid = incoming.filter((file) => file.size <= MAX_FILE_SIZE);
+    const tooLarge: File[] = [];
+    const notAllowed: File[] = [];
+    const valid: File[] = [];
 
+    for (const file of incoming) {
+      if (file.size > MAX_FILE_SIZE) {
+        tooLarge.push(file);
+      } else if (!isAdmin && !file.type.startsWith("image/")) {
+        notAllowed.push(file);
+      } else {
+        valid.push(file);
+      }
+    }
+
+    const errors: string[] = [];
     if (tooLarge.length > 0) {
-      setError(
+      errors.push(
         `다음 파일은 20MB를 초과해서 첨부할 수 없어요: ${tooLarge
           .map((file) => file.name)
           .join(", ")}`
       );
-    } else {
-      setError("");
     }
+    if (notAllowed.length > 0) {
+      errors.push(
+        `이미지 파일만 첨부할 수 있어요: ${notAllowed
+          .map((file) => file.name)
+          .join(", ")}`
+      );
+    }
+    setError(errors.join(" "));
 
     if (valid.length > 0) {
       setFiles((prev) => [...prev, ...valid.map((file) => ({ file }))]);
@@ -90,6 +109,7 @@ export default function NewPostForm({ isAdmin }: { isAdmin: boolean }) {
         author: user.email,
         user_id: user.id,
         is_notice: isAdmin ? isNotice : false,
+        is_private: isPrivate,
       })
       .select()
       .single();
@@ -157,11 +177,14 @@ export default function NewPostForm({ isAdmin }: { isAdmin: boolean }) {
         <input
           type="file"
           multiple
+          accept={isAdmin ? undefined : "image/*"}
           onChange={(e) => e.target.files && addFiles(e.target.files)}
           className="text-sm"
         />
         <p className="mt-1 text-xs text-black/50 dark:text-white/50">
-          파일은 1개당 최대 20MB까지 첨부할 수 있어요.
+          {isAdmin
+            ? "파일은 1개당 최대 20MB까지 첨부할 수 있어요."
+            : "이미지 파일만 첨부할 수 있어요 (1개당 최대 20MB)."}
         </p>
       </div>
 
@@ -184,6 +207,15 @@ export default function NewPostForm({ isAdmin }: { isAdmin: boolean }) {
           ))}
         </ul>
       )}
+
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={isPrivate}
+          onChange={(e) => setIsPrivate(e.target.checked)}
+        />
+        비공개로 등록 (작성자와 관리자만 볼 수 있어요)
+      </label>
 
       {isAdmin && (
         <label className="flex items-center gap-2 text-sm">

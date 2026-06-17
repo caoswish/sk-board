@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ReplyForm from "./reply-form";
+import PrivacyToggle from "./privacy-toggle";
 
 export default async function PostPage({
   params,
@@ -12,7 +13,9 @@ export default async function PostPage({
 
   const { data: post } = await supabase
     .from("posts_public")
-    .select("id, title, content, author, created_at, is_notice, user_id")
+    .select(
+      "id, title, content, author, created_at, is_notice, is_private, user_id"
+    )
     .eq("id", id)
     .single();
 
@@ -65,8 +68,18 @@ export default async function PostPage({
             공지
           </span>
         )}
+        {post.is_private && (
+          <span className="mr-2 rounded bg-gray-600 px-2 py-0.5 align-middle text-xs font-bold text-white">
+            🔒비공개
+          </span>
+        )}
         {post.title}
       </h1>
+      {isAdmin && (
+        <div className="mt-2">
+          <PrivacyToggle postId={post.id} isPrivate={post.is_private} />
+        </div>
+      )}
       <p className="mt-2 text-sm text-black/50 dark:text-white/50">
         {authorInfo && (
           <span className="font-medium text-black dark:text-white">
