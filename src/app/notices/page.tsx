@@ -1,8 +1,24 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function NoticesPage() {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  let isAdmin = false;
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", user.id)
+    .single();
+  isAdmin = profile?.is_admin ?? false;
 
   const { data: notices, error } = await supabase
     .from("posts_public")
@@ -35,6 +51,15 @@ export default async function NoticesPage() {
   return (
     <div>
       <h1 className="mb-6 text-xl font-bold">공지사항</h1>
+
+      {isAdmin && (
+        <Link
+          href="/posts/new"
+          className="mb-6 inline-block rounded bg-black px-4 py-2 text-sm font-medium text-white dark:bg-white dark:text-black"
+        >
+          공지 작성하기 (글쓰기 화면에서 &quot;공지사항으로 등록&quot; 체크)
+        </Link>
+      )}
 
       {error ? (
         <p className="text-red-600">

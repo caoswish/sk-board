@@ -1,7 +1,26 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import FaqForm from "./faq-form";
 
 export default async function FaqPage() {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  let isAdmin = false;
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", user.id)
+    .single();
+  isAdmin = profile?.is_admin ?? false;
+
   const { data: faqs, error } = await supabase
     .from("faqs")
     .select("id, question, answer, created_at")
@@ -10,6 +29,8 @@ export default async function FaqPage() {
   return (
     <div>
       <h1 className="mb-6 text-xl font-bold">자주 묻는 질문</h1>
+
+      {isAdmin && <FaqForm />}
 
       {error ? (
         <p className="text-red-600">
@@ -31,6 +52,21 @@ export default async function FaqPage() {
           ))}
         </ul>
       )}
+
+      <div className="mt-8 flex gap-3">
+        <Link
+          href="/"
+          className="flex-1 rounded bg-black px-4 py-3 text-center font-medium text-white dark:bg-white dark:text-black"
+        >
+          과정 문의 바로가기
+        </Link>
+        <Link
+          href="/notices"
+          className="flex-1 rounded border border-black/20 px-4 py-3 text-center font-medium dark:border-white/20"
+        >
+          공지사항 바로가기
+        </Link>
+      </div>
     </div>
   );
 }

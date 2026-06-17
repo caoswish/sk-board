@@ -6,12 +6,20 @@ function escapeForFilter(value: string) {
   return value.replace(/[,().:]/g, "\\$&");
 }
 
+function buildHref(params: { q?: string; status?: string }) {
+  const sp = new URLSearchParams();
+  if (params.q) sp.set("q", params.q);
+  if (params.status) sp.set("status", params.status);
+  const qs = sp.toString();
+  return qs ? `/?${qs}` : "/";
+}
+
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; status?: string }>;
 }) {
-  const { q } = await searchParams;
+  const { q, status } = await searchParams;
   const supabase = await createClient();
 
   let query = supabase
@@ -27,7 +35,7 @@ export default async function Home({
     query = query.or(`title.ilike.%${safeQ}%,content.ilike.%${safeQ}%`);
   }
 
-  const { data: posts, error } = await query;
+  const { data: allPosts, error } = await query;
 
   const {
     data: { user },
@@ -44,15 +52,24 @@ export default async function Home({
   }
 
   const answeredPostIds = new Set<number>();
-  if (user && posts && posts.length > 0) {
+  if (user && allPosts && allPosts.length > 0) {
     const { data: answeredRows } = await supabase
       .from("replies")
       .select("post_id")
       .in(
         "post_id",
-        posts.map((p) => p.id)
+        allPosts.map((p) => p.id)
       );
     answeredRows?.forEach((row) => answeredPostIds.add(row.post_id));
+  }
+
+  let posts = allPosts;
+  if (user && posts && (status === "answered" || status === "pending")) {
+    posts = posts.filter((post) => {
+      if (post.is_notice) return false;
+      const answered = answeredPostIds.has(post.id);
+      return status === "answered" ? answered : !answered;
+    });
   }
 
   const authorInfo = new Map<
@@ -90,7 +107,8 @@ export default async function Home({
         </p>
       )}
 
-      <form action="/" className="mb-6 flex gap-2">
+      <form action="/" className="mb-4 flex gap-2">
+        <input type="hidden" name="status" value={status ?? ""} />
         <input
           type="text"
           name="q"
@@ -106,13 +124,38 @@ export default async function Home({
         </button>
         {q && (
           <Link
-            href="/"
+            href={buildHref({ status })}
             className="rounded border border-black/20 px-4 py-2 text-sm dark:border-white/20"
           >
             초기화
           </Link>
         )}
       </form>
+
+      {user && (
+        <div className="mb-6 flex gap-2 text-sm">
+          {[
+            { label: "전체", value: undefined },
+            { label: "답변대기", value: "pending" },
+            { label: "답변완료", value: "answered" },
+          ].map((option) => {
+            const active = (status ?? undefined) === option.value;
+            return (
+              <Link
+                key={option.label}
+                href={buildHref({ q, status: option.value })}
+                className={`rounded px-3 py-1.5 font-medium ${
+                  active
+                    ? "bg-black text-white dark:bg-white dark:text-black"
+                    : "border border-black/20 dark:border-white/20"
+                }`}
+              >
+                {option.label}
+              </Link>
+            );
+          })}
+        </div>
+      )}
 
       {error ? (
         <p className="text-red-600">
