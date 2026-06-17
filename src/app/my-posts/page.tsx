@@ -23,7 +23,7 @@ export default async function MyPostsPage() {
   const answeredPostIds = new Set<number>();
   if (posts && posts.length > 0) {
     const { data: answeredRows } = await supabase
-      .from("replies")
+      .from("replies_public")
       .select("post_id")
       .in(
         "post_id",

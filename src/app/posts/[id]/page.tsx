@@ -29,7 +29,7 @@ export default async function PostPage({
   }
 
   const { data: replies } = await supabase
-    .from("replies")
+    .from("replies_public")
     .select("id, content, created_at")
     .eq("post_id", id)
     .order("created_at", { ascending: true });
