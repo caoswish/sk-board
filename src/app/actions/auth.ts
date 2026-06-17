@@ -53,21 +53,6 @@ export async function signup(
     return { error: "목록에 있는 회사를 선택해주세요." };
   }
 
-  const { data: allowed, error: checkError } = await supabase.rpc(
-    "is_email_allowed",
-    { check_email: email }
-  );
-
-  if (checkError) {
-    return { error: checkError.message };
-  }
-
-  if (!allowed) {
-    return {
-      error: "사전에 등록된 이메일만 가입할 수 있어요. 담당자에게 문의해주세요.",
-    };
-  }
-
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
