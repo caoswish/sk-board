@@ -1,65 +1,90 @@
-import Image from "next/image";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
 
-export default function Home() {
+function escapeForFilter(value: string) {
+  return value.replace(/[,().:]/g, "\\$&");
+}
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q } = await searchParams;
+  const supabase = await createClient();
+
+  let query = supabase
+    .from("posts")
+    .select("id, title, author, created_at, is_notice")
+    .order("is_notice", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if (q) {
+    const safeQ = escapeForFilter(q);
+    query = query.or(`title.ilike.%${safeQ}%,content.ilike.%${safeQ}%`);
+  }
+
+  const { data: posts, error } = await query;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div>
+      <form action="/" className="mb-6 flex gap-2">
+        <input
+          type="text"
+          name="q"
+          defaultValue={q ?? ""}
+          placeholder="제목이나 내용으로 검색"
+          className="flex-1 rounded border border-black/20 px-3 py-2 dark:border-white/20 dark:bg-transparent"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        <button
+          type="submit"
+          className="rounded bg-black px-4 py-2 text-white dark:bg-white dark:text-black"
+        >
+          검색
+        </button>
+        {q && (
+          <Link
+            href="/"
+            className="rounded border border-black/20 px-4 py-2 text-sm dark:border-white/20"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+            초기화
+          </Link>
+        )}
+      </form>
+
+      {error ? (
+        <p className="text-red-600">
+          글 목록을 불러오지 못했어요: {error.message}
+        </p>
+      ) : !posts || posts.length === 0 ? (
+        <p className="text-black/60 dark:text-white/60">
+          {q
+            ? `"${q}"에 대한 검색 결과가 없어요.`
+            : "아직 작성된 글이 없어요. 첫 글을 남겨보세요!"}
+        </p>
+      ) : (
+        <ul className="divide-y divide-black/10 dark:divide-white/10">
+          {posts.map((post) => (
+            <li key={post.id} className="py-4">
+              <Link
+                href={`/posts/${post.id}`}
+                className="text-lg font-medium hover:underline"
+              >
+                {post.is_notice && (
+                  <span className="mr-2 rounded bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
+                    공지
+                  </span>
+                )}
+                {post.title}
+              </Link>
+              <p className="mt-1 text-sm text-black/50 dark:text-white/50">
+                {post.author} ·{" "}
+                {new Date(post.created_at).toLocaleString("ko-KR")}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
