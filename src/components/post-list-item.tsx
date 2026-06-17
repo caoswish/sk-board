@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatDateTime } from "@/lib/format-date";
 
 type Post = {
   id: number;
@@ -70,7 +71,7 @@ export default function PostListItem({
             {" · "}
           </span>
         )}
-        {post.author} · {new Date(post.created_at).toLocaleString("ko-KR")}
+        {post.author} · {formatDateTime(post.created_at)}
       </p>
     </li>
   );

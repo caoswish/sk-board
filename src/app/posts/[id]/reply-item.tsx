@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { updateReply, deleteReply } from "@/app/actions/replies";
+import { formatDateTime } from "@/lib/format-date";
 
 type Reply = {
   id: number;
@@ -90,7 +91,7 @@ export default function ReplyItem({
       <p className="whitespace-pre-wrap">{savedContent}</p>
       <div className="mt-2 flex items-center justify-between">
         <p className="text-xs text-black/50 dark:text-white/50">
-          관리자 · {new Date(reply.created_at).toLocaleString("ko-KR")}
+          관리자 · {formatDateTime(reply.created_at)}
         </p>
         {isAdmin && (
           <div className="flex gap-2">

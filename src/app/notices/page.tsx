@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { formatDateTime } from "@/lib/format-date";
 
 export default async function NoticesPage() {
   const supabase = await createClient();
@@ -75,7 +76,7 @@ export default async function NoticesPage() {
             <li key={notice.id} className="py-6">
               <h2 className="text-lg font-bold">{notice.title}</h2>
               <p className="mt-1 text-xs text-black/50 dark:text-white/50">
-                {new Date(notice.created_at).toLocaleString("ko-KR")}
+                {formatDateTime(notice.created_at)}
               </p>
               <p className="mt-4 whitespace-pre-wrap leading-relaxed">
                 {notice.content}

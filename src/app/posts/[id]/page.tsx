@@ -6,6 +6,7 @@ import ReplyItem from "./reply-item";
 import PrivacyToggle from "./privacy-toggle";
 import DeletePostButton from "./delete-post-button";
 import LikeButton from "./like-button";
+import { formatDateTime } from "@/lib/format-date";
 
 const FAQ_RECOMMEND_THRESHOLD = 10;
 
@@ -123,7 +124,7 @@ export default async function PostPage({
             {" · "}
           </span>
         )}
-        {post.author} · {new Date(post.created_at).toLocaleString("ko-KR")}
+        {post.author} · {formatDateTime(post.created_at)}
       </p>
       <p className="mt-6 whitespace-pre-wrap leading-relaxed">
         {post.content}
