@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { POST_CATEGORIES, type PostCategory } from "@/lib/post-categories";
 
 type PendingFile = {
   file: File;
@@ -15,6 +16,7 @@ export default function NewPostForm({ isAdmin }: { isAdmin: boolean }) {
   const supabase = createClient();
 
   const [title, setTitle] = useState("");
+  const [category, setCategory] = useState<PostCategory>(POST_CATEGORIES[0]);
   const [content, setContent] = useState("");
   const [isNotice, setIsNotice] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
@@ -110,6 +112,7 @@ export default function NewPostForm({ isAdmin }: { isAdmin: boolean }) {
         user_id: user.id,
         is_notice: isAdmin ? isNotice : false,
         is_private: isPrivate,
+        category,
       })
       .select()
       .single();
@@ -153,6 +156,21 @@ export default function NewPostForm({ isAdmin }: { isAdmin: boolean }) {
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <h1 className="text-xl font-bold">새 글 쓰기</h1>
       {error && <p className="text-sm text-red-600">{error}</p>}
+
+      <div>
+        <label className="mb-2 block text-sm font-medium">카테고리</label>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value as PostCategory)}
+          className="rounded border border-black/20 px-3 py-2 dark:border-white/20 dark:bg-transparent"
+        >
+          {POST_CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <input
         value={title}

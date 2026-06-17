@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { POST_CATEGORIES } from "@/lib/post-categories";
 
 export async function togglePrivacy(postId: number, nextValue: boolean) {
   const supabase = await createClient();
@@ -30,11 +31,16 @@ export async function updatePost(
 ): Promise<UpdatePostState> {
   const title = (formData.get("title") as string)?.trim();
   const content = (formData.get("content") as string)?.trim();
+  const category = formData.get("category") as string;
   const isPrivate = formData.get("isPrivate") === "on";
   const isNotice = isAdmin && formData.get("isNotice") === "on";
 
   if (!title || !content) {
     return { error: "제목과 내용을 모두 입력해주세요." };
+  }
+
+  if (!POST_CATEGORIES.includes(category as (typeof POST_CATEGORIES)[number])) {
+    return { error: "올바른 카테고리를 선택해주세요." };
   }
 
   const supabase = await createClient();
@@ -43,6 +49,7 @@ export async function updatePost(
     .update({
       title,
       content,
+      category,
       is_private: isPrivate,
       is_notice: isNotice,
     })

@@ -19,7 +19,7 @@ export default async function PostPage({
   const { data: post } = await supabase
     .from("posts_public")
     .select(
-      "id, title, content, author, created_at, is_notice, is_private, user_id"
+      "id, title, content, author, created_at, is_notice, is_private, user_id, category"
     )
     .eq("id", id)
     .single();
@@ -96,6 +96,9 @@ export default async function PostPage({
             🔒비공개
           </span>
         )}
+        <span className="mr-1 align-middle text-indigo-600 dark:text-indigo-400">
+          [{post.category}]
+        </span>
         {post.title}
       </h1>
       {(isAdmin || isOwner) && (

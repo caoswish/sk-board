@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import PostListItem from "@/components/post-list-item";
+import { POST_CATEGORIES } from "@/lib/post-categories";
 
 function escapeForFilter(value: string) {
   return value.replace(/[,().:]/g, "\\$&");
 }
 
-function buildHref(params: { q?: string; status?: string }) {
+function buildHref(params: { q?: string; status?: string; category?: string }) {
   const sp = new URLSearchParams();
   if (params.q) sp.set("q", params.q);
   if (params.status) sp.set("status", params.status);
+  if (params.category) sp.set("category", params.category);
   const qs = sp.toString();
   return qs ? `/?${qs}` : "/";
 }
@@ -17,15 +19,15 @@ function buildHref(params: { q?: string; status?: string }) {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string }>;
+  searchParams: Promise<{ q?: string; status?: string; category?: string }>;
 }) {
-  const { q, status } = await searchParams;
+  const { q, status, category } = await searchParams;
   const supabase = await createClient();
 
   let query = supabase
     .from("posts_public")
     .select(
-      "id, title, content, author, created_at, is_notice, is_private, user_id"
+      "id, title, content, author, created_at, is_notice, is_private, user_id, category"
     )
     .order("is_notice", { ascending: false })
     .order("created_at", { ascending: false });
@@ -33,6 +35,10 @@ export default async function Home({
   if (q) {
     const safeQ = escapeForFilter(q);
     query = query.or(`title.ilike.%${safeQ}%,content.ilike.%${safeQ}%`);
+  }
+
+  if (category) {
+    query = query.eq("category", category);
   }
 
   const { data: allPosts, error } = await query;
@@ -107,8 +113,20 @@ export default async function Home({
         </p>
       )}
 
-      <form action="/" className="mb-4 flex gap-2">
+      <form action="/" className="mb-4 flex flex-wrap gap-2">
         <input type="hidden" name="status" value={status ?? ""} />
+        <select
+          name="category"
+          defaultValue={category ?? ""}
+          className="rounded border border-black/20 px-3 py-2 dark:border-white/20 dark:bg-transparent"
+        >
+          <option value="">전체 카테고리</option>
+          {POST_CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
         <input
           type="text"
           name="q"
@@ -122,7 +140,7 @@ export default async function Home({
         >
           검색
         </button>
-        {q && (
+        {(q || category) && (
           <Link
             href={buildHref({ status })}
             className="rounded border border-black/20 px-4 py-2 text-sm dark:border-white/20"
@@ -143,7 +161,7 @@ export default async function Home({
             return (
               <Link
                 key={option.label}
-                href={buildHref({ q, status: option.value })}
+                href={buildHref({ q, category, status: option.value })}
                 className={`rounded px-3 py-1.5 font-medium ${
                   active
                     ? "bg-black text-white dark:bg-white dark:text-black"

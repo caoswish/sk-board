@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { updatePost } from "@/app/actions/posts";
+import { POST_CATEGORIES } from "@/lib/post-categories";
 
 type Post = {
   id: number;
@@ -9,6 +10,7 @@ type Post = {
   content: string;
   is_notice: boolean;
   is_private: boolean;
+  category: string;
 };
 
 export default function EditPostForm({
@@ -25,6 +27,21 @@ export default function EditPostForm({
     <form action={formAction} className="flex flex-col gap-4">
       <h1 className="text-xl font-bold">글 수정</h1>
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+
+      <div>
+        <label className="mb-2 block text-sm font-medium">카테고리</label>
+        <select
+          name="category"
+          defaultValue={post.category}
+          className="rounded border border-black/20 px-3 py-2 dark:border-white/20 dark:bg-transparent"
+        >
+          {POST_CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <input
         name="title"

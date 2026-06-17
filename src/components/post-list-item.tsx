@@ -8,6 +8,7 @@ type Post = {
   created_at: string;
   is_notice: boolean;
   is_private: boolean;
+  category: string;
 };
 
 function getSnippet(content: string, maxLength = 80) {
@@ -54,6 +55,9 @@ export default function PostListItem({
               답변대기
             </span>
           ))}
+        <span className="mr-1 text-indigo-600 dark:text-indigo-400">
+          [{post.category}]
+        </span>
         {post.title}
       </Link>
       <p className="mt-1 line-clamp-1 text-sm text-black/60 dark:text-white/60">
