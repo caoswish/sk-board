@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { maskEmail } from "@/lib/mask-email";
 import ReplyForm from "./reply-form";
 
 export default async function PostPage({
@@ -12,7 +11,7 @@ export default async function PostPage({
   const supabase = await createClient();
 
   const { data: post } = await supabase
-    .from("posts")
+    .from("posts_public")
     .select("id, title, content, author, created_at, is_notice, user_id")
     .eq("id", id)
     .single();
@@ -75,7 +74,7 @@ export default async function PostPage({
             {" · "}
           </span>
         )}
-        {maskEmail(post.author)} · {new Date(post.created_at).toLocaleString("ko-KR")}
+        {post.author} · {new Date(post.created_at).toLocaleString("ko-KR")}
       </p>
       <p className="mt-6 whitespace-pre-wrap leading-relaxed">
         {post.content}

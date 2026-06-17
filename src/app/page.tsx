@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { maskEmail } from "@/lib/mask-email";
 
 function escapeForFilter(value: string) {
   return value.replace(/[,().:]/g, "\\$&");
@@ -20,7 +19,7 @@ export default async function Home({
   const supabase = await createClient();
 
   let query = supabase
-    .from("posts")
+    .from("posts_public")
     .select("id, title, content, author, created_at, is_notice, user_id")
     .order("is_notice", { ascending: false })
     .order("created_at", { ascending: false });
@@ -142,7 +141,7 @@ export default async function Home({
                       {" · "}
                     </span>
                   )}
-                  {maskEmail(post.author)} ·{" "}
+                  {post.author} ·{" "}
                   {new Date(post.created_at).toLocaleString("ko-KR")}
                 </p>
               </li>
