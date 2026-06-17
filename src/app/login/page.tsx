@@ -38,6 +38,11 @@ export default function LoginPage() {
           회원가입
         </Link>
       </p>
+      <p className="text-sm text-black/60 dark:text-white/60">
+        <Link href="/forgot-password" className="underline">
+          비밀번호를 잊으셨나요?
+        </Link>
+      </p>
     </form>
   );
 }

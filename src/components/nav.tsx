@@ -19,6 +19,7 @@ export default async function Nav() {
             <>
               <Link href="/posts/new">글쓰기</Link>
               <Link href="/my-posts">내 글</Link>
+              <Link href="/account">계정</Link>
               <span className="text-black/50 dark:text-white/50">
                 {user.email}
               </span>
