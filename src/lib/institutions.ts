@@ -8,3 +8,9 @@ export const INSTITUTIONS = [
 ] as const;
 
 export type Institution = (typeof INSTITUTIONS)[number];
+
+export const INSTITUTION_BOARDS = ["mysuni", "academy"] as const;
+
+export function usesInstitution(board: string) {
+  return (INSTITUTION_BOARDS as readonly string[]).includes(board);
+}

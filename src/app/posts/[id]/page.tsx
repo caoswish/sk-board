@@ -7,6 +7,7 @@ import PrivacyToggle from "./privacy-toggle";
 import DeletePostButton from "./delete-post-button";
 import LikeButton from "./like-button";
 import { formatDateTime } from "@/lib/format-date";
+import { usesInstitution } from "@/lib/institutions";
 
 const FAQ_RECOMMEND_THRESHOLD = 10;
 
@@ -99,7 +100,7 @@ export default async function PostPage({
           </span>
         )}
         <span className="mr-1 align-middle text-indigo-600 dark:text-indigo-400">
-          [{post.board === "mysuni" ? post.institution : post.category}]
+          [{usesInstitution(post.board) ? post.institution : post.category}]
         </span>
         {post.title}
       </h1>

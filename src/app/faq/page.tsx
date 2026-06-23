@@ -58,7 +58,7 @@ export default async function FaqPage() {
           href="/"
           className="flex-1 rounded bg-black px-4 py-3 text-center font-medium text-white dark:bg-white dark:text-black"
         >
-          과정 문의 바로가기
+          Survey 문의 바로가기
         </Link>
         <Link
           href="/notices"

@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { updatePost } from "@/app/actions/posts";
 import { POST_CATEGORIES } from "@/lib/post-categories";
-import { INSTITUTIONS } from "@/lib/institutions";
+import { INSTITUTIONS, usesInstitution } from "@/lib/institutions";
 
 type Post = {
   id: number;
@@ -31,7 +31,7 @@ export default function EditPostForm({
       <h1 className="text-xl font-bold">글 수정</h1>
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
 
-      {post.board === "mysuni" ? (
+      {usesInstitution(post.board) ? (
         <div>
           <label className="mb-2 block text-sm font-medium">연수원</label>
           <select

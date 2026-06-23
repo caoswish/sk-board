@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { POST_CATEGORIES } from "@/lib/post-categories";
-import { INSTITUTIONS } from "@/lib/institutions";
+import { INSTITUTIONS, usesInstitution } from "@/lib/institutions";
 
 export async function togglePrivacy(postId: number, nextValue: boolean) {
   const supabase = await createClient();
@@ -47,7 +47,7 @@ export async function updatePost(
     is_notice: isNotice,
   };
 
-  if (board === "mysuni") {
+  if (usesInstitution(board)) {
     const institution = formData.get("institution") as string;
     if (!INSTITUTIONS.includes(institution as (typeof INSTITUTIONS)[number])) {
       return { error: "올바른 연수원을 선택해주세요." };
