@@ -15,7 +15,7 @@ export default async function MyPostsPage() {
   const { data: posts, error } = await supabase
     .from("posts_public")
     .select(
-      "id, title, content, author, created_at, is_notice, is_private, user_id, category"
+      "id, title, content, author, created_at, is_notice, is_private, user_id, category, board, institution"
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });

@@ -21,7 +21,7 @@ export default async function PostPage({
   const { data: post } = await supabase
     .from("posts_public")
     .select(
-      "id, title, content, author, created_at, is_notice, is_private, user_id, category"
+      "id, title, content, author, created_at, is_notice, is_private, user_id, category, board, institution"
     )
     .eq("id", id)
     .single();
@@ -99,7 +99,7 @@ export default async function PostPage({
           </span>
         )}
         <span className="mr-1 align-middle text-indigo-600 dark:text-indigo-400">
-          [{post.category}]
+          [{post.board === "mysuni" ? post.institution : post.category}]
         </span>
         {post.title}
       </h1>

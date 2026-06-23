@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { updatePost } from "@/app/actions/posts";
 import { POST_CATEGORIES } from "@/lib/post-categories";
+import { INSTITUTIONS } from "@/lib/institutions";
 
 type Post = {
   id: number;
@@ -11,6 +12,8 @@ type Post = {
   is_notice: boolean;
   is_private: boolean;
   category: string;
+  board: string;
+  institution: string | null;
 };
 
 export default function EditPostForm({
@@ -20,7 +23,7 @@ export default function EditPostForm({
   post: Post;
   isAdmin: boolean;
 }) {
-  const action = updatePost.bind(null, post.id, isAdmin);
+  const action = updatePost.bind(null, post.id, isAdmin, post.board);
   const [state, formAction, pending] = useActionState(action, undefined);
 
   return (
@@ -28,20 +31,37 @@ export default function EditPostForm({
       <h1 className="text-xl font-bold">글 수정</h1>
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
 
-      <div>
-        <label className="mb-2 block text-sm font-medium">카테고리</label>
-        <select
-          name="category"
-          defaultValue={post.category}
-          className="rounded border border-black/20 bg-white px-3 py-2 text-black dark:border-white/20 dark:bg-zinc-900 dark:text-white [color-scheme:dark]"
-        >
-          {POST_CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-      </div>
+      {post.board === "mysuni" ? (
+        <div>
+          <label className="mb-2 block text-sm font-medium">소속 기관</label>
+          <select
+            name="institution"
+            defaultValue={post.institution ?? ""}
+            className="rounded border border-black/20 bg-white px-3 py-2 text-black dark:border-white/20 dark:bg-zinc-900 dark:text-white [color-scheme:dark]"
+          >
+            {INSTITUTIONS.map((i) => (
+              <option key={i} value={i}>
+                {i}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : (
+        <div>
+          <label className="mb-2 block text-sm font-medium">카테고리</label>
+          <select
+            name="category"
+            defaultValue={post.category}
+            className="rounded border border-black/20 bg-white px-3 py-2 text-black dark:border-white/20 dark:bg-zinc-900 dark:text-white [color-scheme:dark]"
+          >
+            {POST_CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <input
         name="title"

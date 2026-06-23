@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { POST_CATEGORIES, type PostCategory } from "@/lib/post-categories";
+import { INSTITUTIONS, type Institution } from "@/lib/institutions";
 
 type PendingFile = {
   file: File;
@@ -11,12 +11,14 @@ type PendingFile = {
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
 
-export default function NewPostForm({ isAdmin }: { isAdmin: boolean }) {
+export default function MySuniPostForm({ isAdmin }: { isAdmin: boolean }) {
   const router = useRouter();
   const supabase = createClient();
 
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<PostCategory>(POST_CATEGORIES[0]);
+  const [institution, setInstitution] = useState<Institution>(
+    INSTITUTIONS[0]
+  );
   const [content, setContent] = useState("");
   const [isNotice, setIsNotice] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
@@ -112,8 +114,9 @@ export default function NewPostForm({ isAdmin }: { isAdmin: boolean }) {
         user_id: user.id,
         is_notice: isAdmin ? isNotice : false,
         is_private: isPrivate,
-        category,
-        board: "inquiry",
+        category: "기타",
+        board: "mysuni",
+        institution,
       })
       .select()
       .single();
@@ -155,19 +158,19 @@ export default function NewPostForm({ isAdmin }: { isAdmin: boolean }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <h1 className="text-xl font-bold">새 글 쓰기</h1>
+      <h1 className="text-xl font-bold">★ mySUNI 이용문의 작성</h1>
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <div>
-        <label className="mb-2 block text-sm font-medium">카테고리</label>
+        <label className="mb-2 block text-sm font-medium">소속 기관</label>
         <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value as PostCategory)}
+          value={institution}
+          onChange={(e) => setInstitution(e.target.value as Institution)}
           className="rounded border border-black/20 bg-white px-3 py-2 text-black dark:border-white/20 dark:bg-zinc-900 dark:text-white [color-scheme:dark]"
         >
-          {POST_CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {c}
+          {INSTITUTIONS.map((i) => (
+            <option key={i} value={i}>
+              {i}
             </option>
           ))}
         </select>

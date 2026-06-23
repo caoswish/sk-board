@@ -10,6 +10,8 @@ type Post = {
   is_notice: boolean;
   is_private: boolean;
   category: string;
+  board: string;
+  institution: string | null;
 };
 
 function getSnippet(content: string, maxLength = 80) {
@@ -57,7 +59,7 @@ export default function PostListItem({
             </span>
           ))}
         <span className="mr-1 text-indigo-600 dark:text-indigo-400">
-          [{post.category}]
+          [{post.board === "mysuni" ? post.institution : post.category}]
         </span>
         {post.title}
       </Link>

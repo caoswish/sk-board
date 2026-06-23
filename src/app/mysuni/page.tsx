@@ -1,27 +1,31 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import PostListItem from "@/components/post-list-item";
-import { POST_CATEGORIES } from "@/lib/post-categories";
+import { INSTITUTIONS } from "@/lib/institutions";
 
 function escapeForFilter(value: string) {
   return value.replace(/[,().:]/g, "\\$&");
 }
 
-function buildHref(params: { q?: string; status?: string; category?: string }) {
+function buildHref(params: {
+  q?: string;
+  status?: string;
+  institution?: string;
+}) {
   const sp = new URLSearchParams();
   if (params.q) sp.set("q", params.q);
   if (params.status) sp.set("status", params.status);
-  if (params.category) sp.set("category", params.category);
+  if (params.institution) sp.set("institution", params.institution);
   const qs = sp.toString();
-  return qs ? `/?${qs}` : "/";
+  return qs ? `/mysuni?${qs}` : "/mysuni";
 }
 
-export default async function Home({
+export default async function MySuniPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string; category?: string }>;
+  searchParams: Promise<{ q?: string; status?: string; institution?: string }>;
 }) {
-  const { q, status, category } = await searchParams;
+  const { q, status, institution } = await searchParams;
   const supabase = await createClient();
 
   let query = supabase
@@ -29,7 +33,7 @@ export default async function Home({
     .select(
       "id, title, content, author, created_at, is_notice, is_private, user_id, category, board, institution"
     )
-    .eq("board", "inquiry")
+    .eq("board", "mysuni")
     .order("is_notice", { ascending: false })
     .order("created_at", { ascending: false });
 
@@ -38,8 +42,8 @@ export default async function Home({
     query = query.or(`title.ilike.%${safeQ}%,content.ilike.%${safeQ}%`);
   }
 
-  if (category) {
-    query = query.eq("category", category);
+  if (institution) {
+    query = query.eq("institution", institution);
   }
 
   const { data: allPosts, error } = await query;
@@ -101,6 +105,18 @@ export default async function Home({
 
   return (
     <div>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-xl font-bold">★ mySUNI 이용문의</h1>
+        {user && (
+          <Link
+            href="/mysuni/new"
+            className="flex items-center gap-1 rounded-full bg-black px-4 py-1.5 font-bold text-white hover:bg-black/80 dark:bg-white dark:text-black dark:hover:bg-white/80"
+          >
+            ✏️ 글쓰기
+          </Link>
+        )}
+      </div>
+
       {!user && (
         <p className="mb-6 rounded-lg border-2 border-amber-400 bg-amber-50 px-4 py-4 text-base font-bold text-amber-900 dark:border-amber-500 dark:bg-amber-950 dark:text-amber-200">
           글을 쓰거나 답변을 확인하려면 로그인이 필요해요.{" "}
@@ -114,17 +130,17 @@ export default async function Home({
         </p>
       )}
 
-      <form action="/" className="mb-4 flex flex-wrap gap-2">
+      <form action="/mysuni" className="mb-4 flex flex-wrap gap-2">
         <input type="hidden" name="status" value={status ?? ""} />
         <select
-          name="category"
-          defaultValue={category ?? ""}
+          name="institution"
+          defaultValue={institution ?? ""}
           className="rounded border border-black/20 bg-white px-3 py-2 text-black dark:border-white/20 dark:bg-zinc-900 dark:text-white [color-scheme:dark]"
         >
-          <option value="">전체 카테고리</option>
-          {POST_CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {c}
+          <option value="">전체 기관</option>
+          {INSTITUTIONS.map((i) => (
+            <option key={i} value={i}>
+              {i}
             </option>
           ))}
         </select>
@@ -141,7 +157,7 @@ export default async function Home({
         >
           검색
         </button>
-        {(q || category) && (
+        {(q || institution) && (
           <Link
             href={buildHref({ status })}
             className="rounded border border-black/20 px-4 py-2 text-sm dark:border-white/20"
@@ -162,7 +178,7 @@ export default async function Home({
             return (
               <Link
                 key={option.label}
-                href={buildHref({ q, category, status: option.value })}
+                href={buildHref({ q, institution, status: option.value })}
                 className={`rounded px-3 py-1.5 font-medium ${
                   active
                     ? "bg-black text-white dark:bg-white dark:text-black"
