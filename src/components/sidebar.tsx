@@ -7,7 +7,7 @@ const TABS = [
   { href: "/notices", label: "공지사항" },
   { href: "/", label: "Survey 문의" },
   { href: "/mysuniqna", label: "★ mySUNI 이용문의" },
-  { href: "/academy", label: "★ 연수원 문의사항" },
+  { href: "/siteqna", label: "★ 연수원 문의사항" },
   { href: "/faq", label: "FAQ" },
 ];
 

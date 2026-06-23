@@ -17,7 +17,7 @@ function buildHref(params: {
   if (params.status) sp.set("status", params.status);
   if (params.institution) sp.set("institution", params.institution);
   const qs = sp.toString();
-  return qs ? `/academy?${qs}` : "/academy";
+  return qs ? `/siteqna?${qs}` : "/siteqna";
 }
 
 export default async function AcademyPage({
@@ -109,7 +109,7 @@ export default async function AcademyPage({
         <h1 className="text-xl font-bold">★ 연수원 문의사항</h1>
         {user && (
           <Link
-            href="/academy/new"
+            href="/siteqna/new"
             className="flex items-center gap-1 rounded-full bg-black px-4 py-1.5 font-bold text-white hover:bg-black/80 dark:bg-white dark:text-black dark:hover:bg-white/80"
           >
             ✏️ 글쓰기
@@ -130,7 +130,7 @@ export default async function AcademyPage({
         </p>
       )}
 
-      <form action="/academy" className="mb-4 flex flex-wrap gap-2">
+      <form action="/siteqna" className="mb-4 flex flex-wrap gap-2">
         <input type="hidden" name="status" value={status ?? ""} />
         <select
           name="institution"
