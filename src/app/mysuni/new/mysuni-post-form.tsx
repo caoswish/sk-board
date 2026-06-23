@@ -162,7 +162,7 @@ export default function MySuniPostForm({ isAdmin }: { isAdmin: boolean }) {
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <div>
-        <label className="mb-2 block text-sm font-medium">소속 기관</label>
+        <label className="mb-2 block text-sm font-medium">연수원</label>
         <select
           value={institution}
           onChange={(e) => setInstitution(e.target.value as Institution)}

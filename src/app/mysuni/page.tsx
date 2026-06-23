@@ -137,7 +137,7 @@ export default async function MySuniPage({
           defaultValue={institution ?? ""}
           className="rounded border border-black/20 bg-white px-3 py-2 text-black dark:border-white/20 dark:bg-zinc-900 dark:text-white [color-scheme:dark]"
         >
-          <option value="">전체 기관</option>
+          <option value="">전체 연수원</option>
           {INSTITUTIONS.map((i) => (
             <option key={i} value={i}>
               {i}

@@ -33,7 +33,7 @@ export default function EditPostForm({
 
       {post.board === "mysuni" ? (
         <div>
-          <label className="mb-2 block text-sm font-medium">소속 기관</label>
+          <label className="mb-2 block text-sm font-medium">연수원</label>
           <select
             name="institution"
             defaultValue={post.institution ?? ""}

@@ -50,7 +50,7 @@ export async function updatePost(
   if (board === "mysuni") {
     const institution = formData.get("institution") as string;
     if (!INSTITUTIONS.includes(institution as (typeof INSTITUTIONS)[number])) {
-      return { error: "올바른 기관을 선택해주세요." };
+      return { error: "올바른 연수원을 선택해주세요." };
     }
     updates.institution = institution;
   } else {
