@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const TABS = [
   { href: "/notices", label: "공지사항" },
   { href: "/", label: "과정 문의" },
-  { href: "/mysuni", label: "★ mySUNI 이용문의" },
+  { href: "/mysuniqna", label: "★ mySUNI 이용문의" },
   { href: "/faq", label: "FAQ" },
 ];
 
