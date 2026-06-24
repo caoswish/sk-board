@@ -127,9 +127,21 @@ export default async function PostPage({
         )}
         {post.author} · {formatDateTime(post.created_at)}
       </p>
-      <p className="mt-6 whitespace-pre-wrap leading-relaxed">
-        {post.content}
-      </p>
+      {post.is_notice ? (
+        <div
+          className="mt-6 leading-relaxed
+            [&_video]:max-w-full [&_video]:rounded
+            [&_iframe]:max-w-full [&_iframe]:rounded
+            [&_img]:max-w-full [&_img]:rounded
+            [&_a]:text-blue-600 [&_a]:underline
+            [&_p]:mt-2 [&_br]:block"
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
+      ) : (
+        <p className="mt-6 whitespace-pre-wrap leading-relaxed">
+          {post.content}
+        </p>
+      )}
 
       {!post.is_notice && (
         <div className="mt-4 flex flex-wrap items-center gap-2">

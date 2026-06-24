@@ -79,6 +79,16 @@ export default function EditPostForm({
         rows={10}
         className="rounded border border-black/20 px-3 py-2 dark:border-white/20 dark:bg-transparent"
       />
+      {isAdmin && (
+        <p className="text-xs text-black/40 dark:text-white/40">
+          공지사항에는 HTML을 직접 입력할 수 있어요.{" "}
+          유튜브 삽입 예시:{" "}
+          <span className="font-mono">
+            &lt;iframe src=&quot;https://www.youtube.com/embed/영상ID&quot; width=&quot;100%&quot; height=&quot;315&quot; allowfullscreen&gt;&lt;/iframe&gt;
+          </span>
+          {" "}— 유튜브 영상 주소의 <span className="font-mono">watch?v=</span> 뒤 값이 영상ID예요.
+        </p>
+      )}
 
       <label className="flex items-center gap-2 text-sm">
         <input
