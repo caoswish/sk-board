@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import FaqForm from "./faq-form";
+import FaqItem from "./faq-item";
 
 export default async function FaqPage() {
   const supabase = await createClient();
@@ -43,12 +44,7 @@ export default async function FaqPage() {
       ) : (
         <ul className="flex flex-col divide-y divide-black/10 dark:divide-white/10">
           {faqs.map((faq) => (
-            <li key={faq.id} className="py-4">
-              <p className="font-bold">Q. {faq.question}</p>
-              <p className="mt-2 whitespace-pre-wrap text-sm text-black/70 dark:text-white/70">
-                A. {faq.answer}
-              </p>
-            </li>
+            <FaqItem key={faq.id} faq={faq} isAdmin={isAdmin} />
           ))}
         </ul>
       )}
