@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "2026년 7월 SK그룹 신입구성원과정 (7/1 ~ 7/15)",
+  title: "'26년 7월 SK그룹 신입구성원과정 (7/1 ~ 7/15)",
   description: "Next.js + Supabase로 만든 Q&A 게시판",
 };
 
