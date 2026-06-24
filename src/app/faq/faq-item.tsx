@@ -18,6 +18,7 @@ export default function FaqItem({
   isAdmin: boolean;
 }) {
   const router = useRouter();
+  const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [question, setQuestion] = useState(faq.question);
   const [answer, setAnswer] = useState(faq.answer);
@@ -31,6 +32,7 @@ export default function FaqItem({
         setErrorMsg(result.error);
       } else {
         setEditing(false);
+        setOpen(true);
         setErrorMsg(null);
       }
     });
@@ -57,12 +59,12 @@ export default function FaqItem({
         <textarea
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          placeholder="답변 (HTML 가능 — 예: <video controls><source src='...'></video>)"
+          placeholder="답변 (HTML 가능 — 유튜브: <iframe src='https://www.youtube.com/embed/영상ID' width='560' height='315' allowfullscreen></iframe>)"
           rows={6}
           className="w-full rounded border border-black/20 px-3 py-2 text-sm dark:border-white/20 dark:bg-zinc-900 dark:text-white"
         />
         <p className="mt-1 text-xs text-black/40 dark:text-white/40">
-          HTML 태그를 직접 입력할 수 있습니다. 동영상: &lt;video controls&gt;&lt;source src=&quot;URL&quot; type=&quot;video/mp4&quot;&gt;&lt;/video&gt; / YouTube: &lt;iframe src=&quot;embed URL&quot; ...&gt;&lt;/iframe&gt;
+          유튜브 삽입 예시: &lt;iframe src=&quot;https://www.youtube.com/embed/영상ID&quot; width=&quot;100%&quot; height=&quot;315&quot; allowfullscreen&gt;&lt;/iframe&gt;
         </p>
         <div className="mt-2 flex gap-2">
           <button
@@ -89,13 +91,24 @@ export default function FaqItem({
   }
 
   return (
-    <li className="py-4">
-      <div className="flex items-start justify-between gap-2">
-        <p className="font-bold">Q. {faq.question}</p>
+    <li className="divide-y divide-black/5 dark:divide-white/5">
+      <div className="flex items-center gap-2 py-4">
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="flex flex-1 items-center justify-between gap-2 text-left"
+        >
+          <span className="font-bold">
+            <span className="mr-2 text-indigo-500 dark:text-indigo-400">Q.</span>
+            {faq.question}
+          </span>
+          <span className="shrink-0 text-black/40 dark:text-white/40">
+            {open ? "▲" : "▼"}
+          </span>
+        </button>
         {isAdmin && (
           <div className="flex shrink-0 gap-1">
             <button
-              onClick={() => setEditing(true)}
+              onClick={() => { setEditing(true); setOpen(false); }}
               className="rounded border border-black/20 px-2 py-0.5 text-xs dark:border-white/20"
             >
               수정
@@ -110,18 +123,22 @@ export default function FaqItem({
           </div>
         )}
       </div>
-      <div className="mt-1 text-sm font-medium text-black/50 dark:text-white/50">
-        A.
-      </div>
-      <div
-        className="mt-1 text-sm text-black/70 dark:text-white/70
-          [&_video]:max-w-full [&_video]:rounded
-          [&_iframe]:max-w-full [&_iframe]:rounded
-          [&_img]:max-w-full [&_img]:rounded
-          [&_a]:text-blue-600 [&_a]:underline
-          [&_p]:mt-1 [&_br]:block"
-        dangerouslySetInnerHTML={{ __html: faq.answer }}
-      />
+
+      {open && (
+        <div className="pb-4 pt-3">
+          <p className="mb-2 text-sm font-semibold text-indigo-500 dark:text-indigo-400">
+            A.
+          </p>
+          <div
+            className="text-sm leading-relaxed text-black/80 dark:text-white/80
+              [&_video]:max-w-full [&_video]:rounded
+              [&_iframe]:max-w-full [&_iframe]:rounded
+              [&_img]:max-w-full [&_img]:rounded
+              [&_a]:text-blue-600 [&_a]:underline"
+            dangerouslySetInnerHTML={{ __html: faq.answer }}
+          />
+        </div>
+      )}
     </li>
   );
 }
